@@ -8,9 +8,9 @@ st.set_page_config(page_title="Præcist Boksplot Træning", layout="centered")
 st.markdown("""
     <style>
         .small-input input {
-            height: 1.6em !important;
+            height: 1.0em !important;
             padding: 2px 6px !important;
-            font-size: 0.9em !important;
+            font-size: 0.5em !important;
         }
     </style>
 """, unsafe_allow_html=True)
