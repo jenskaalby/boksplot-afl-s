@@ -100,25 +100,41 @@ st.pyplot(fig)
 with st.sidebar:
     st.markdown("### ✏️ Aflæs værdier")
 
-    cols = st.columns(5)
-    labels = ["Minimum", "Q1", "Median", "Q3", "Maksimum"]
-    user_input = {}
+    # Overskrift over felterne
+    st.markdown("**Indtast værdier for:**")
+    col_labels = st.columns(5)
+    labels = ["Min", "Q1", "Median", "Q3", "Maks"]
+    for col, label in zip(col_labels, labels):
+        col.markdown(f"<div style='text-align: center'><b>{label}</b></div>", unsafe_allow_html=True)
 
+    # Inputfelter under overskrifterne
+    cols = st.columns(5)
+    user_input = {}
     for col, label in zip(cols, labels):
         with col:
             user_input[label] = st.text_input(
                 label=label,
                 key=f"input_{label}",
                 label_visibility="collapsed",
-                placeholder=label,
+                placeholder="",
             )
 
+    # Tjek svar
     if st.button("Tjek svar"):
         all_correct = True
-        for label in labels:
+        mapping = {
+            "Min": "Minimum",
+            "Q1": "Q1",
+            "Median": "Median",
+            "Q3": "Q3",
+            "Maks": "Maksimum"
+        }
+
+        for short_label in labels:
+            label = mapping[short_label]
             correct_val = st.session_state["answers"][label]
             try:
-                user_val = int(user_input[label])
+                user_val = int(user_input[short_label])
                 if user_val == correct_val:
                     st.success(f"{label}: ✅ Korrekt")
                 else:
@@ -131,7 +147,6 @@ with st.sidebar:
         if all_correct:
             st.balloons()
             st.success("Super godt! Alle værdier er korrekte 🎉")
-
 
 # Licens og kredit i sidebar
 with st.sidebar:
