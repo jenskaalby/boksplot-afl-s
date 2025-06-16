@@ -4,16 +4,6 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Præcist Boksplot Træning", layout="centered")
 
-# CSS for mindre inputfelter
-st.markdown("""
-    <style>
-        .small-input input {
-            height: 1.0em !important;
-            padding: 2px 6px !important;
-            font-size: 0.5em !important;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 # Mindre overskrift med markdown
 st.markdown("## 📦 Træn aflæsning af boksplot")
@@ -106,27 +96,22 @@ st.pyplot(fig)
 
 
 # Brugerinput i sidebar
+
 with st.sidebar:
     st.markdown("### ✏️ Aflæs værdier")
 
-    user_input = {}
+    cols = st.columns(5)
     labels = ["Minimum", "Q1", "Median", "Q3", "Maksimum"]
+    user_input = {}
 
-    st.markdown("""
-    <style>
-        .form-input input {
-            width: 100%;
-            height: 1.6em;
-            font-size: 0.9em;
-            padding: 2px 6px;
-            margin-bottom: 0.3em;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    for label in labels:
-        value = st.text_input(label, key=f"input_{label}")
-        user_input[label] = value.strip()
+    for col, label in zip(cols, labels):
+        with col:
+            user_input[label] = st.text_input(
+                label=label,
+                key=f"input_{label}",
+                label_visibility="collapsed",
+                placeholder=label,
+            )
 
     if st.button("Tjek svar"):
         all_correct = True
@@ -146,7 +131,6 @@ with st.sidebar:
         if all_correct:
             st.balloons()
             st.success("Super godt! Alle værdier er korrekte 🎉")
-        st.session_state["checked"] = True
 
 
 # Licens og kredit i sidebar
