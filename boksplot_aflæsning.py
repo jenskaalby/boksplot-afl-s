@@ -4,6 +4,17 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Præcist Boksplot Træning", layout="centered")
 
+# CSS for mindre inputfelter
+st.markdown("""
+    <style>
+        .small-input input {
+            height: 1.6em !important;
+            padding: 2px 6px !important;
+            font-size: 0.9em !important;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Mindre overskrift med markdown
 st.markdown("## 📦 Træn aflæsning af boksplot")
 st.write("Aflæs værdierne for minimum, Q1, median, Q3 og maksimum fra boksplottet og skriv dem ind.")
@@ -99,23 +110,31 @@ with st.sidebar:
     st.markdown("### ✏️ Aflæs værdier")
     user_input = {}
     labels = ["Minimum", "Q1", "Median", "Q3", "Maksimum"]
+
     for label in labels:
-        user_input[label] = st.number_input(label, step=1, format="%d", key=f"input_{label}")
+        val = st.text_input(label, key=f"input_{label}")
+        user_input[label] = val.strip()
 
     if st.button("Tjek svar"):
         all_correct = True
         for label in labels:
-            user_val = int(user_input[label])
             correct_val = st.session_state["answers"][label]
-            if user_val == correct_val:
-                st.success(f"{label}: ✅ Korrekt")
-            else:
-                st.error(f"{label}: ❌ Forkert (rigtigt svar: {correct_val})")
+            try:
+                user_val = int(user_input[label])
+                if user_val == correct_val:
+                    st.success(f"{label}: ✅ Korrekt")
+                else:
+                    st.error(f"{label}: ❌ Forkert (rigtigt svar: {correct_val})")
+                    all_correct = False
+            except ValueError:
+                st.error(f"{label}: ⚠️ Indtast et heltal")
                 all_correct = False
+
         if all_correct:
             st.balloons()
             st.success("Super godt! Alle værdier er korrekte 🎉")
         st.session_state["checked"] = True
+
 
 # Licens og kredit i sidebar
 with st.sidebar:
