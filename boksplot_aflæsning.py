@@ -108,12 +108,25 @@ st.pyplot(fig)
 # Brugerinput i sidebar
 with st.sidebar:
     st.markdown("### ✏️ Aflæs værdier")
+
     user_input = {}
     labels = ["Minimum", "Q1", "Median", "Q3", "Maksimum"]
 
+    st.markdown("""
+    <style>
+        .form-input input {
+            width: 100%;
+            height: 1.6em;
+            font-size: 0.9em;
+            padding: 2px 6px;
+            margin-bottom: 0.3em;
+        }
+    </style>
+    """, unsafe_allow_html=True)
+
     for label in labels:
-        val = st.text_input(label, key=f"input_{label}")
-        user_input[label] = val.strip()
+        value = st.text_input(label, key=f"input_{label}")
+        user_input[label] = value.strip()
 
     if st.button("Tjek svar"):
         all_correct = True
