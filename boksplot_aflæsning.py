@@ -123,11 +123,11 @@ with st.sidebar:
     if st.button("Tjek svar"):
         all_correct = True
         mapping = {
-            "Min": "Minimum",
+            "min": "Minimum",
             "Q1": "Q1",
-            "Median": "Median",
+            "median": "Median",
             "Q3": "Q3",
-            "Maks": "Maksimum"
+            "maks": "Maksimum"
         }
 
         for short_label in labels:
