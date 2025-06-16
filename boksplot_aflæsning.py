@@ -109,5 +109,5 @@ with st.sidebar:
     st.markdown("### ℹ️ Licens og kredit")
     st.markdown(
         "Denne opgave er udgivet under [MIT-licensen](https://opensource.org/licenses/MIT).  \n"
-        "Udviklet af Jens Kaalby Thomsen."
+        "Udviklet af [Dit Navn]. Venligst giv kredit ved brug."
     )
