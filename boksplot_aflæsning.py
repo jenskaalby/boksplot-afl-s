@@ -103,7 +103,7 @@ with st.sidebar:
     # Overskrift over felterne
     st.markdown("**Indtast værdier for:**")
     col_labels = st.columns(5)
-    labels = ["Min", "Q1", "Median", "Q3", "Maks"]
+    labels = ["min", "Q1", "median", "Q3", "maks"]
     for col, label in zip(col_labels, labels):
         col.markdown(f"<div style='text-align: center'><b>{label}</b></div>", unsafe_allow_html=True)
 
@@ -123,11 +123,11 @@ with st.sidebar:
     if st.button("Tjek svar"):
         all_correct = True
         mapping = {
-            "min": "Minimum",
+            "Min": "Minimum",
             "Q1": "Q1",
-            "median": "Median",
+            "Median": "Median",
             "Q3": "Q3",
-            "maks": "Maksimum"
+            "Maks": "Maksimum"
         }
 
         for short_label in labels:
