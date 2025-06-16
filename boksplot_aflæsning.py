@@ -1,113 +1,70 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
-st.set_page_config(page_title="Præcist Boksplot Træning", layout="centered")
-
-
-# Mindre overskrift med markdown
-st.markdown("## 📦 Træn aflæsning af boksplot")
-st.write("Aflæs værdierne for minimum, Q1, median, Q3 og maksimum fra boksplottet og skriv dem ind.")
-
-def round_down_5(x):
-    return x - (x % 5)
-
-def round_up_5(x):
-    return x + (5 - x % 5) if x % 5 != 0 else x
-
+# --- Function to generate dataset ---
 def generate_data():
-    min_val = np.random.randint(0, 71)
-    range_width = np.random.randint(30, 41)
-    max_val = min_val + range_width
-    size = np.random.randint(10, 20)
-    data = np.random.randint(min_val, max_val + 1, size=size)
-    return data
+    min_val = random.randint(50, 70)
+    max_val = min_val + random.randint(30, 40)
+    data = np.random.randint(min_val, max_val + 1, size=21)
+    return np.sort(data)
 
-def calculate_integer_quartiles(data):
-    minimum = int(data.min())
-    maksimum = int(data.max())
-    Q1 = int(np.percentile(data, 25, method='nearest'))
-    median = int(np.percentile(data, 50, method='nearest'))
-    Q3 = int(np.percentile(data, 75, method='nearest'))
+# --- Function to calculate quartiles and descriptors ---
+def calculate_descriptors(data):
+    q1 = int(np.percentile(data, 25, method="midpoint"))
+    median = int(np.percentile(data, 50, method="midpoint"))
+    q3 = int(np.percentile(data, 75, method="midpoint"))
     return {
-        "Minimum": minimum,
-        "Q1": Q1,
+        "Minimum": int(np.min(data)),
+        "Q1": q1,
         "Median": median,
-        "Q3": Q3,
-        "Maksimum": maksimum,
+        "Q3": q3,
+        "Maksimum": int(np.max(data)),
     }
 
-def plot_precise_boxplot(ax, stats, x_min, x_max):
-    y_center = 0.5
-    box_height = 0.3
-
-    ax.plot([stats["Minimum"], stats["Q1"]], [y_center, y_center], color="black", lw=2)
-    ax.plot([stats["Q3"], stats["Maksimum"]], [y_center, y_center], color="black", lw=2)
-
-    cap_height = box_height / 2
-    ax.plot([stats["Minimum"], stats["Minimum"]], [y_center - cap_height, y_center + cap_height], color="black", lw=2)
-    ax.plot([stats["Maksimum"], stats["Maksimum"]], [y_center - cap_height, y_center + cap_height], color="black", lw=2)
-
-    box_left = stats["Q1"]
-    box_right = stats["Q3"]
-    rect = plt.Rectangle((box_left, y_center - box_height / 2),
-                         box_right - box_left,
-                         box_height,
-                         facecolor="skyblue",
-                         edgecolor="black",
-                         lw=2)
-    ax.add_patch(rect)
-
-    ax.plot([stats["Median"], stats["Median"]],
-            [y_center - box_height / 2, y_center + box_height / 2],
-            color="black", lw=2)
-
-    ax.set_ylim(0, 1)
-    ax.set_xlim(x_min, x_max)
-    ax.set_yticks([])
-    ax.set_xlabel("Værdi")
-
-    major_ticks = np.arange(round_down_5(x_min), round_up_5(x_max) + 1, 5)
-    ax.set_xticks(major_ticks)
-
-    minor_ticks = np.arange(round_down_5(x_min), round_up_5(x_max) + 1, 1)
-    ax.set_xticks(minor_ticks, minor=True)
-
-    ax.tick_params(axis='x', which='minor', length=4, color='gray')
-    ax.grid(axis='x', which='major', linestyle='--', alpha=0.5)
-
-if "data" not in st.session_state or st.button("🔁 Ny opgave"):
-    data = generate_data()
-    st.session_state["data"] = data
+# --- Initialize session state ---
+if "data" not in st.session_state or st.button("Ny opgave"):
+    st.session_state["data"] = generate_data()
+    st.session_state["answers"] = calculate_descriptors(st.session_state["data"])
     st.session_state["checked"] = False
 
-data = st.session_state["data"]
-answers = calculate_integer_quartiles(data)
-st.session_state["answers"] = answers
+# --- Page config ---
+st.set_page_config(page_title="Aflæs Boksplot", layout="wide")
 
-x_min = answers["Minimum"] - 1
-x_max = answers["Maksimum"] + 1
+# --- Title ---
+st.markdown("## 📊 Aflæs et boksplot")
 
-st.markdown(f"🔢 Antal tal i datasættet: **{len(data)}**")
+# --- Plotting boxplot ---
+fig, ax = plt.subplots(figsize=(6, 2))
+ax.boxplot(st.session_state["data"], vert=False, patch_artist=True,
+           boxprops=dict(facecolor='lightblue', color='black'),
+           medianprops=dict(color='black', linewidth=2),
+           whiskerprops=dict(color='black'),
+           capprops=dict(color='black'))
 
-fig, ax = plt.subplots(figsize=(8, 2))
-plot_precise_boxplot(ax, answers, x_min, x_max)
+# Axis settings
+data_min = int(np.min(st.session_state["data"]))
+data_max = int(np.max(st.session_state["data"]))
+ax.set_xlim(data_min - 1, data_max + 1)
+ax.set_xticks(np.arange(data_min - 1, data_max + 2, 1), minor=True)
+ax.set_xticks(range(((data_min - 1) // 5) * 5, data_max + 2, 5), minor=False)
+ax.grid(True, axis='x', which='both', linestyle=':', linewidth=0.5)
+ax.get_yaxis().set_visible(False)
+
 st.pyplot(fig)
 
-
-# Brugerinput i sidebar
-
+# --- Sidebar Input ---
 with st.sidebar:
     st.markdown("### ✏️ Aflæs værdier")
 
-    # Overskrift over felterne
-    st.markdown("**Indtast værdier for:**")
+    # Header row
     col_labels = st.columns(5)
-    labels = ["min", "Q1", "median", "Q3", "maks"]
+    labels = ["Min", "Q1", "Median", "Q3", "Maks"]
     for col, label in zip(col_labels, labels):
         col.markdown(f"<div style='text-align: center'><b>{label}</b></div>", unsafe_allow_html=True)
 
-    # Inputfelter under overskrifterne
+    # Input fields
     cols = st.columns(5)
     user_input = {}
     for col, label in zip(cols, labels):
@@ -119,19 +76,18 @@ with st.sidebar:
                 placeholder="",
             )
 
-    # Tjek svar
+    # Check answers
     if st.button("Tjek svar"):
         all_correct = True
-        mapping = {
+        label_map = {
             "Min": "Minimum",
             "Q1": "Q1",
             "Median": "Median",
             "Q3": "Q3",
             "Maks": "Maksimum"
         }
-
         for short_label in labels:
-            label = mapping[short_label]
+            label = label_map[short_label]
             correct_val = st.session_state["answers"][label]
             try:
                 user_val = int(user_input[short_label])
@@ -148,8 +104,8 @@ with st.sidebar:
             st.balloons()
             st.success("Super godt! Alle værdier er korrekte 🎉")
 
-# Licens og kredit i sidebar
-with st.sidebar:
+    # License and credit
+    st.markdown("---")
     st.markdown("### ℹ️ Licens og kredit")
     st.markdown(
         "Denne opgave er udgivet under [MIT-licensen](https://opensource.org/licenses/MIT).  \n"
