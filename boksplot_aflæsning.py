@@ -93,28 +93,29 @@ fig, ax = plt.subplots(figsize=(8, 2))
 plot_precise_boxplot(ax, answers, x_min, x_max)
 st.pyplot(fig)
 
-st.subheader("✏️ Skriv aflæste værdier")
-user_input = {}
-cols = st.columns(5)
-labels = ["Minimum", "Q1", "Median", "Q3", "Maksimum"]
-for i, label in enumerate(labels):
-    with cols[i]:
+
+# Brugerinput i sidebar
+with st.sidebar:
+    st.markdown("### ✏️ Aflæs værdier")
+    user_input = {}
+    labels = ["Minimum", "Q1", "Median", "Q3", "Maksimum"]
+    for label in labels:
         user_input[label] = st.number_input(label, step=1, format="%d", key=f"input_{label}")
 
-if st.button("Tjek svar"):
-    all_correct = True
-    for label in labels:
-        user_val = int(user_input[label])
-        correct_val = answers[label]
-        if user_val == correct_val:
-            st.success(f"{label}: ✅ Korrekt")
-        else:
-            st.error(f"{label}: ❌ Forkert (rigtigt svar: {correct_val})")
-            all_correct = False
-    if all_correct:
-        st.balloons()
-        st.success("Super godt! Alle værdier er korrekte 🎉")
-    st.session_state["checked"] = True
+    if st.button("Tjek svar"):
+        all_correct = True
+        for label in labels:
+            user_val = int(user_input[label])
+            correct_val = st.session_state["answers"][label]
+            if user_val == correct_val:
+                st.success(f"{label}: ✅ Korrekt")
+            else:
+                st.error(f"{label}: ❌ Forkert (rigtigt svar: {correct_val})")
+                all_correct = False
+        if all_correct:
+            st.balloons()
+            st.success("Super godt! Alle værdier er korrekte 🎉")
+        st.session_state["checked"] = True
 
 # Licens og kredit i sidebar
 with st.sidebar:
